@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="card result-card">
+
+    <div class="page-icon">📊</div>
+
+    <h2>AI Evaluation Report</h2>
+
+    <p class="muted">
+        Comprehensive candidate assessment generated using
+        Resume Screening and AI Interview Analysis.
+    </p>
+
+    <div class="score-grid">
+
+        <div class="score-box">
+            <span>Resume Score</span>
+            <strong>{{ resume_score }}%</strong>
+        </div>
+
+        <div class="score-box">
+            <span>Interview Score</span>
+            <strong>{{ interview_score }}%</strong>
+        </div>
+
+        <div class="score-box">
+            <span>Final Score</span>
+            <strong>{{ final_score }}%</strong>
+        </div>
+
+    </div>
+
+    <div class="decision-box">
+        {{ decision }}
+    </div>
+
+    {% if feedback %}
+    <div class="feedback-box">
+        <h3>AI Feedback</h3>
+        <p>{{ feedback }}</p>
+    </div>
+    {% endif %}
+
+    <a href="/" class="primary-button">
+        Return to Home
+    </a>
+
+</section>
+
+{% endblock %}

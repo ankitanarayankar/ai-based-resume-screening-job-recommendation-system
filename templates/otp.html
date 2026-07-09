@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="card card-narrow">
+
+    <div class="page-icon">📧</div>
+
+    <h2>Email Verification</h2>
+
+    <p class="muted">
+        Enter the 6-digit OTP sent to your Gmail account.
+    </p>
+
+    {% if error %}
+    <p class="error-box">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" class="form-grid">
+
+        <label>OTP Code</label>
+
+        <input
+            type="text"
+            name="otp"
+            placeholder="Enter OTP"
+            required>
+
+        <button type="submit" class="primary-button">
+            Verify OTP
+        </button>
+
+    </form>
+
+</section>
+
+{% endblock %}

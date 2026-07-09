@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>AI Resume Screening</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            AI Resume Screening
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">Home</a>
+            <a href="/upload">Resume Analysis</a>
+            <a href="/interview">AI Interview</a>
+            <a href="/logout">Logout</a>
+
+        </div>
+        <button onclick="toggleTheme()" class="theme-btn">
+            🌙 Theme
+        </button>
+
+    </nav>
+
+    <div class="main-content">
+
+        {% block content %}
+        {% endblock %}
+
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <footer class="footer">
+
+        <p>AI Resume Screening System | Final Year Project</p>
+
+    </footer>
+    <script>
+        function toggleTheme() {
+        
+            document.body.classList.toggle("light-mode");
+        
+            if(document.body.classList.contains("light-mode")){
+                localStorage.setItem("theme","light");
+            }
+            else{
+                localStorage.setItem("theme","dark");
+            }
+        }
+        
+        window.onload = function(){
+        
+            if(localStorage.getItem("theme") === "light"){
+                document.body.classList.add("light-mode");
+            }
+        
+        }
+        </script>
+        
+    
+
+</body>
+
+</html>

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="card card-narrow">
+
+    <div class="page-icon">🔐</div>
+
+    <h2>Secure Login</h2>
+
+    <p class="muted">
+        Enter your Gmail address to receive a secure OTP verification code.
+    </p>
+
+    {% if error %}
+    <p class="error-box">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" class="form-grid">
+
+        <label>Email Address</label>
+
+        <input
+            type="email"
+            name="email"
+            placeholder="example@gmail.com"
+            required>
+
+        <button type="submit" class="primary-button">
+            Send OTP
+        </button>
+
+    </form>
+
+</section>
+
+{% endblock %}

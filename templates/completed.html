@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card result-card">
+    <div class="page-icon">✅</div>
+    <h2>Assessment Already Completed</h2>
+    <p class="muted">This interview session has already been submitted and cannot be reopened within the current login session.</p>
+
+    <div class="decision-box">
+        Your assessment is complete.
+    </div>
+
+    <div class="feedback-box">
+        <h3>What happens next?</h3>
+        <p>Your results have been finalized and the system will use the submitted interview response for your final decision.</p>
+    </div>
+
+    <div class="text-center">
+        <a href="/logout" class="primary-button" style="display:inline-block;text-decoration:none;">Logout</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="progress-bar">
+    Login ✓ → Resume ✓ → Interview ➜ Result
+</div>
+
+<section class="card interview-shell" id="interview-shell">
+    <div class="interview-header">
+        <div>
+            <h2>AI Interview Assessment</h2>
+            <p class="muted">Answer all 10 questions clearly to improve your final score.</p>
+        </div>
+        <div class="status-stack">
+            <div class="status-pill" id="fullscreen-status">Full Screen: Off</div>
+            <div class="status-pill warning-pill">Warnings: <span id="warning-count">0/3</span></div>
+        </div>
+    </div>
+
+    <div id="timer-box">
+        ⏳ Time Remaining:
+        <span id="timer">15:00</span>
+    </div>
+
+    <div class="interview-panel is-hidden" id="interview-panel">
+        <form action="/evaluate" method="POST" class="form-grid interview-form" id="interview-form">
+            {% for q in questions %}
+            <div class="qa-block">
+                <label><strong>Q{{ loop.index }}.</strong> {{ q }}</label>
+                <textarea
+                    name="answer_{{ loop.index0 }}"
+                    rows="4"
+                    placeholder="Write your answer for Question {{ loop.index }}"
+                    required
+                ></textarea>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="primary-button">Submit Interview Answers</button>
+        </form>
+    </div>
+</section>
+
+<div class="rules-modal active" id="rules-modal" role="dialog" aria-modal="true" aria-labelledby="rules-title">
+    <div class="rules-card">
+        <h3 id="rules-title">Professional Interview Rules</h3>
+        <ul class="rules-list">
+            <li><strong>Total Time:</strong> 15 Minutes</li>
+            <li><strong>Full Screen Mode:</strong> Required for the assessment</li>
+            <li><strong>No Tab Switching:</strong> Violations will be recorded</li>
+            <li><strong>No Refresh:</strong> Refreshing the page may end the session</li>
+            <li><strong>One Attempt Only:</strong> Retakes are not allowed</li>
+            <li><strong>Auto Submission:</strong> After 3 violations or timer expiry</li>
+        </ul>
+        <label class="checkbox-row">
+            <input type="checkbox" id="agree-rules">
+            <span>I agree to the interview rules and understand the assessment conditions.</span>
+        </label>
+        <button type="button" class="primary-button" id="start-interview-btn">Start Interview</button>
+    </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+{% endblock %}

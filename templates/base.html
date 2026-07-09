@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Resume Screening</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">AI Resume Screening</div>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/upload">Resume Analysis</a>
+        <a href="/interview">AI Interview</a>
+        {% if session.get("is_authenticated") %}
+        <a href="/logout" class="pill-button">Logout</a>
+        {% else %}
+        <a href="/login" class="pill-button">Login</a>
+        {% endif %}
+    </div>
+</nav>
+
+<main class="page-shell">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div>
+            <h4>AI Resume Screening</h4>
+            <p>Professional candidate evaluation with AI-assisted screening and interviews.</p>
+        </div>
+        <div>
+            <h4>Workflow</h4>
+            <p>Login and OTP verification</p>
+            <p>Resume screening and AI interview</p>
+            <p>Final score based selection</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

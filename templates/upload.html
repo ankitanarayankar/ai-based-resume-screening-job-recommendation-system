@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="progress-bar">
+    Login ✓ → Resume Upload ➜ Interview ➜ Result
+</div>
+
+
+
+<section class="card upload-card">
+
+    <div class="page-icon">📄</div>
+
+    <h2>AI Resume Screening</h2>
+
+    <p class="muted">
+        Upload your resume and let our AI evaluate skills,
+        experience, projects and job suitability.
+    </p>
+
+    {% if error %}
+    <p class="error-box">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" class="form-grid">
+
+        <label>Resume (PDF Format)</label>
+
+        <input
+            type="file"
+            name="resume"
+            accept=".pdf"
+            required>
+
+        <button type="submit" class="primary-button">
+            Analyze Resume
+        </button>
+
+    </form>
+
+</section>
+
+{% endblock %}
