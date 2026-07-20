@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="progress-bar">
+    Login ✓ → Upload ✓ → Screening Report ➜ Interview Rules → Interview → Result
+</div>
+
+<section class="card result-card">
+
+    <div class="page-icon">📋</div>
+
+    <h2>Resume Screening Report</h2>
+
+    <p class="muted">
+        AI-powered analysis comparing your resume against the current job description.
+    </p>
+
+    <div class="score-grid screening-score-grid">
+        <div class="score-box">
+            <span>Resume Score</span>
+            <strong>{{ resume_score }}%</strong>
+        </div>
+
+        <div class="score-box">
+            <span>Resume Status</span>
+            <strong class="status-label status-{{ resume_feedback.status | lower }}">
+                {{ resume_feedback.status }}
+            </strong>
+        </div>
+    </div>
+
+    <div class="feedback-box">
+        <h3>Matched Skills</h3>
+        {% if resume_feedback.matched_skills %}
+        <ul class="skill-list skill-list-matched">
+            {% for skill in resume_feedback.matched_skills %}
+            <li>{{ skill }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted">No matching skills identified.</p>
+        {% endif %}
+    </div>
+
+    <div class="feedback-box">
+
+    {% if resume_feedback.status == "Selected" %}
+
+        <h3>Areas to Strengthen</h3>
+
+        {% if resume_feedback.missing_skills %}
+        <ul class="skill-list skill-list-missing">
+            {% for skill in resume_feedback.missing_skills %}
+            <li>{{ skill }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted">No major improvement areas identified.</p>
+        {% endif %}
+
+    {% else %}
+
+        <h3>Missing Skills</h3>
+
+        {% if resume_feedback.missing_skills %}
+        <ul class="skill-list skill-list-missing">
+            {% for skill in resume_feedback.missing_skills %}
+            <li>{{ skill }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted">No significant missing skills identified.</p>
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+    <div class="feedback-box">
+        <h3>Reason for {{ resume_feedback.status }}</h3>
+        <p>{{ resume_feedback.reason }}</p>
+    </div>
+
+    <div class="feedback-box">
+        <h3>AI Recommendation</h3>
+        <p>{{ resume_feedback.recommendation }}</p>
+    </div>
+
+    <div class="screening-actions">
+        {% if shortlisted %}
+        <a href="/interview_rules" class="primary-button">
+            Continue to Interview
+        </a>
+        {% else %}
+        <a href="/" class="primary-button">
+            Back to Home
+        </a>
+        {% endif %}
+    </div>
+
+</section>
+
+{% endblock %}

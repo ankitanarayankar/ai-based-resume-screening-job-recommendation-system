@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="progress-bar">
+    Login ✓ → Upload ✓ → Screening ✓ → Interview Rules ➜ Interview → Result
+</div>
+
+<section class="card interview-rules-card">
+
+    <div class="page-icon">📜</div>
+
+    <h2>Interview Rules</h2>
+
+    <p class="muted">
+        Please read the rules carefully before starting the AI interview assessment.
+    </p>
+
+    <ul class="rules-list rules-page-list">
+        <li><strong>Total Time:</strong> 15 Minutes</li>
+        <li><strong>Full Screen Mode:</strong> Required for the assessment</li>
+        <li><strong>No Tab Switching:</strong> Violations will be recorded</li>
+        <li><strong>No Refresh:</strong> Refreshing the page may end the session</li>
+        <li><strong>One Attempt Only:</strong> Retakes are not allowed</li>
+        <li><strong>Auto Submission:</strong> After 3 violations or timer expiry</li>
+    </ul>
+
+    <a href="/interview" class="primary-button">
+        Proceed to AI Interview
+    </a>
+
+</section>
+
+{% endblock %}

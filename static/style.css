@@ -527,3 +527,116 @@ body{
 .text-center{
     text-align:center;
 }
+
+.screening-score-grid{
+    grid-template-columns:repeat(2,1fr);
+}
+
+.status-label{
+    font-size:28px;
+}
+
+.status-selected{
+    color:#22c55e;
+}
+
+.status-rejected{
+    color:#ef4444;
+}
+
+.skill-list{
+    list-style:none;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    padding:0;
+    margin:0;
+}
+
+.skill-list li{
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.skill-list-matched li{
+    background:rgba(34,197,94,0.15);
+    border:1px solid rgba(34,197,94,0.35);
+    color:#86efac;
+}
+
+.skill-list-missing li{
+    background:rgba(239,68,68,0.15);
+    border:1px solid rgba(239,68,68,0.35);
+    color:#fca5a5;
+}
+
+.screening-actions{
+    margin-top:10px;
+}
+
+.interview-rules-card{
+    max-width:800px;
+}
+
+.rules-page-list{
+    background:#111827;
+    border:1px solid #374151;
+    border-radius:15px;
+    padding:20px 20px 20px 36px;
+    margin:25px 0;
+}
+.assessment-title{
+    margin-top:30px;
+    margin-bottom:20px;
+    font-size:28px;
+    font-weight:700;
+    text-align:center;
+}
+
+.role-box{
+    background:#1f2937;
+    border:2px solid #8b5cf6;
+    color:#fff;
+    text-align:center;
+    font-size:22px;
+    font-weight:700;
+    padding:16px;
+    border-radius:12px;
+    margin-top:10px;
+}
+
+.feedback-box{
+    margin-top:20px;
+}
+
+.feedback-box h4{
+    margin-bottom:15px;
+}
+
+.feedback-box ul{
+    margin-left:20px;
+}
+
+.feedback-box li{
+    margin-bottom:10px;
+}
+.decision-box{
+    margin:30px 0;
+    padding:18px;
+    border-radius:12px;
+    text-align:center;
+    font-size:24px;
+    font-weight:700;
+}
+
+.decision-box.selected{
+    background:#16a34a;
+    color:white;
+}
+
+.decision-box.rejected{
+    background:#dc2626;
+    color:white;
+}

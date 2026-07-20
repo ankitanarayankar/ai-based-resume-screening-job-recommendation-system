@@ -32,16 +32,66 @@
 
     </div>
 
-    <div class="decision-box">
-        {{ decision }}
+    <div class="decision-box {% if decision == 'Selected' %}selected{% else %}rejected{% endif %}">
+    {% if decision == "Selected" %}
+        ✅ Candidate Selected
+    {% else %}
+        ❌ Candidate Rejected
+    {% endif %}
+</div>
+
+    </div>
+        <h3 class="assessment-title">🤖 AI Candidate Assessment</h3>
+
+<div class="feedback-box">
+    <h4>💪 Strengths</h4>
+
+    <ul class="skill-list skill-list-matched">
+        {% for strength in candidate_assessment.strengths %}
+        <li>{{ strength }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="feedback-box">
+    <h4>📈 Areas for Improvement</h4>
+
+    <ul class="skill-list skill-list-missing">
+        {% for area in candidate_assessment.areas_for_improvement %}
+        <li>{{ area }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="feedback-box">
+
+    <h4>💼 Recommended Job Role</h4>
+
+    <div class="role-box">
+        {{ candidate_assessment.recommended_role }}
     </div>
 
-    {% if feedback %}
-    <div class="feedback-box">
-        <h3>AI Feedback</h3>
-        <p>{{ feedback }}</p>
-    </div>
-    {% endif %}
+</div>
+
+<div class="feedback-box">
+
+    <h4>📋 Other Suitable Roles</h4>
+
+    <ul class="skill-list skill-list-matched">
+        {% for role in candidate_assessment.other_suitable_roles %}
+        <li>{{ role }}</li>
+        {% endfor %}
+    </ul>
+
+</div>
+
+<div class="feedback-box">
+
+    <h4>🤖 AI Feedback</h4>
+
+    <p>{{ candidate_assessment.ai_feedback }}</p>
+
+</div>
 
     <a href="/" class="primary-button">
         Return to Home

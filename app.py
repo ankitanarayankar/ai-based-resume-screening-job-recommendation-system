@@ -78,6 +78,343 @@ def _openai_generate(system_prompt, user_prompt, temperature=0.8):
         return None
 
 
+def _fallback_resume_analysis(resume_score):
+    return {
+        "matched_skills": [],
+        "missing_skills": [],
+        "reason": (
+            f"The resume shows a {resume_score:.2f}% semantic similarity to the job description. "
+            "Review the listed skills and project experience against the role requirements."
+        ),
+        "recommendation": (
+            "Align listed skills and project outcomes with the job description "
+            "to improve screening results."
+        ),
+    }
+
+
+def _normalize_resume_analysis(parsed, resume_score):
+    fallback = _fallback_resume_analysis(resume_score)
+    if not isinstance(parsed, dict):
+        return fallback
+
+    matched = parsed.get("matched_skills", [])
+    missing = parsed.get("missing_skills", [])
+    improvement = parsed.get("improvement_skills", [])
+
+    if not isinstance(improvement, list):
+        improvement = []
+    if not isinstance(matched, list):
+        matched = []
+    if not isinstance(missing, list):
+        missing = []
+
+    return {
+        "matched_skills": [str(skill).strip() for skill in matched if str(skill).strip()],
+        "missing_skills": [str(skill).strip() for skill in missing if str(skill).strip()],
+        "improvement_skills": [str(skill).strip() for skill in improvement if str(skill).strip()],
+        "reason": str(parsed.get("reason", fallback["reason"])).strip() or fallback["reason"],
+        "recommendation": (
+            str(parsed.get("recommendation", fallback["recommendation"])).strip()
+            or fallback["recommendation"]
+        ),
+    }
+
+
+def generate_resume_feedback(resume_text, job_description, resume_score):
+    system_prompt = (
+        "You are an experienced HR Recruiter and Technical Hiring Manager. "
+        "Return only valid JSON."
+    )
+    user_prompt = f"""
+You are an experienced HR Recruiter and Technical Hiring Manager.
+
+Analyze the uploaded resume against the given job description.
+
+Job Description:
+{job_description}
+
+Resume:
+{(resume_text or '')[:6000]}
+
+Resume Similarity Score:
+{resume_score:.2f}%
+
+Instructions:
+
+Instructions:
+
+1. Extract the important technical skills present in the resume.
+
+2. Compare them with the required skills in the job description.
+
+3. If the Resume Similarity Score is 50% or above:
+
+   - Return the important Matched Skills.
+   - Instead of "Missing Skills", return only Areas to Strengthen.
+   - Areas to Strengthen should include advanced skills that would improve the candidate's profile, not mandatory missing skills.
+   - Explain why the resume satisfies the minimum screening criteria.
+   - Give professional recommendations for future improvement.
+
+4. If the Resume Similarity Score is below 50%:
+
+   - Return important Matched Skills.
+   - Return Missing Skills that prevented selection.
+   - Explain why the resume does not satisfy the job requirements.
+   - Recommend skills that should be learned.
+
+5. Never invent skills.
+
+6. Do not decide Selected or Rejected.
+
+7. Do not decide interview eligibility.
+
+8. Return ONLY valid JSON.
+
+Return JSON in this exact format:
+
+{{
+    
+    "matched_skills": [],
+    "improvement_skills": [],
+    "missing_skills": [],
+    "reason": "",
+    "recommendation": ""
+
+}}
+"""
+    raw = _openai_generate(system_prompt, user_prompt, temperature=0.2)
+    if not raw:
+        return _fallback_resume_analysis(resume_score)
+    return _normalize_resume_analysis(_safe_json_loads(raw), resume_score)
+
+
+def _fallback_candidate_assessment():
+    return {
+        "strengths": [
+            "Strong foundational technical ability",
+            "Project-driven problem solving",
+            "Clear communication during interviews",
+            "Relevant experience for Python and AI-focused roles",
+        ],
+        "areas_for_improvement": [
+            "Cloud deployment experience",
+            "Testing and debugging discipline",
+            "System design depth",
+            "Broader industry exposure",
+        ],
+        "recommended_role": "Python Developer",
+        "other_suitable_roles": [
+            "Machine Learning Engineer",
+            "AI Engineer",
+            "Data Analyst",
+        ],
+        "ai_feedback": (
+            "The candidate shows a solid foundation in technical work and practical project experience that supports entry-level to junior roles in Python and AI-focused development. "
+            "Their interview responses suggest good problem-solving ability and a willingness to learn. Strengthening cloud deployment, testing, and system design skills would make them more competitive for higher-impact responsibilities. "
+            "The recommended role aligns well with their present profile and long-term growth trajectory."
+        ),
+    }
+
+
+def _normalize_candidate_assessment(parsed):
+    fallback = _fallback_candidate_assessment()
+    if not isinstance(parsed, dict):
+        return fallback
+
+    strengths = parsed.get("strengths", [])
+    improvements = parsed.get("areas_for_improvement", [])
+    other_roles = parsed.get("other_suitable_roles", [])
+
+    if not isinstance(strengths, list):
+        strengths = []
+    if not isinstance(improvements, list):
+        improvements = []
+    if not isinstance(other_roles, list):
+        other_roles = []
+
+    return {
+        "strengths": [str(item).strip() for item in strengths if str(item).strip()],
+        "areas_for_improvement": [str(item).strip() for item in improvements if str(item).strip()],
+        "recommended_role": str(parsed.get("recommended_role", "")).strip() or fallback["recommended_role"],
+        "other_suitable_roles": [str(item).strip() for item in other_roles if str(item).strip()],
+        "ai_feedback": str(parsed.get("ai_feedback", "")).strip() or fallback["ai_feedback"],
+    }
+
+
+def generate_candidate_assessment(
+    resume_text,
+    job_description,
+    resume_score,
+    interview_questions,
+    candidate_answers,
+    interview_score,
+    final_score,
+    final_decision,
+):
+    system_prompt = (
+        "You are an experienced HR Recruitment Assistant specializing in technical hiring. "
+        "Analyze the candidate profile for hiring insights only."
+    )
+    user_prompt = f"""
+You are an experienced HR Recruitment Assistant specializing in technical hiring.
+
+Analyze the candidate profile and return ONLY valid JSON.
+
+Important rules:
+- Do not decide whether the candidate is Selected or Rejected.
+- Do not modify or reinterpret the resume score, interview score, or final score.
+- Focus only on hiring insights, role fit, strengths, improvement areas, and growth guidance.
+- Use the provided resume, project experience, interview responses, and job description.
+
+Resume Text:
+{(resume_text or '')[:8000]}
+
+Job Description:
+{job_description}
+
+Resume Score:
+{resume_score:.2f}
+
+Interview Questions:
+{json.dumps(interview_questions or [], ensure_ascii=True)}
+
+Candidate Answers:
+{json.dumps(candidate_answers or [], ensure_ascii=True)}
+
+Interview Score:
+{interview_score:.2f}
+
+Final Score:
+{final_score:.2f}
+
+Final Decision:
+{final_decision}
+
+Return ONLY valid JSON.
+
+Rules:
+
+1. strengths
+- Return ONLY short skill names.
+- Do NOT write complete sentences.
+- Maximum 5 items.
+
+Good Examples:
+
+"Python Programming"
+
+"Machine Learning"
+
+"NLP"
+
+"Problem Solving"
+
+"Flask Development"
+
+"Project Implementation"
+
+2. areas_for_improvement
+
+Return ONLY short skill names.
+
+Do NOT write complete sentences.
+
+Examples:
+
+"Docker"
+
+"AWS"
+
+"Cloud Deployment"
+
+"SQL"
+
+"Communication"
+
+Maximum 4 items.
+
+3. recommended_role
+
+Return only ONE role.
+
+Examples:
+
+"Machine Learning Engineer"
+
+"Python Developer"
+
+"AI Engineer"
+
+"NLP Engineer"
+
+"Data Analyst"
+
+4. other_suitable_roles
+
+Return 2 to 4 role names only.
+
+Example:
+
+[
+"Python Developer",
+"AI Engineer",
+"Data Analyst"
+]
+
+5. ai_feedback
+
+Write one professional paragraph of around 80-100 words.
+
+Do NOT repeat Resume Score.
+
+Do NOT repeat Interview Score.
+
+Do NOT repeat Final Score.
+
+Explain:
+
+• Technical strengths
+
+• Interview performance
+
+• Why the recommended role is suitable
+
+• Future learning suggestions
+
+Return JSON exactly like this:
+
+{{
+    "strengths":[
+        "Python Programming",
+        "Machine Learning",
+        "NLP",
+        "Problem Solving"
+    ],
+
+    "areas_for_improvement":[
+        "Docker",
+        "AWS",
+        "Cloud Deployment"
+    ],
+
+    "recommended_role":"Machine Learning Engineer",
+
+    "other_suitable_roles":[
+        "Python Developer",
+        "AI Engineer",
+        "Data Analyst"
+    ],
+
+    "ai_feedback":"Professional paragraph here."
+}}
+"""
+    raw = _openai_generate(system_prompt, user_prompt, temperature=0.3)
+    if not raw:
+        return _fallback_candidate_assessment()
+    return _normalize_candidate_assessment(_safe_json_loads(raw))
+
+
 def _fallback_questions():
     pool = [
         "Explain one project in your resume and your exact role in it.",
@@ -268,6 +605,9 @@ def login():
         session.pop("interview_completed", None)
         session.pop("interview_questions", None)
         session.pop("interview_started", None)
+        session.pop("resume_text", None)
+        session.pop("resume_score", None)
+        session.pop("resume_feedback", None)
         session["is_authenticated"] = False
 
         sent, message = send_otp(email, otp)
@@ -311,24 +651,56 @@ def upload():
         resume_score = round(score * 100, 2)
         session["resume_score"] = resume_score
 
-        if score < RESUME_THRESHOLD:
-            return render_template(
-                "result.html",
-                resume_score=resume_score,
-                interview_score=0,
-                final_score=resume_score,
-                decision="Rejected at Resume Stage",
-                feedback="The resume did not meet the minimum job matching threshold.",
-            )
-
-        session["interview_questions"] = generate_interview_questions(
+        resume_feedback = generate_resume_feedback(
             resume_text=resume_text,
             job_description=JOB_DESCRIPTION,
-            total=10,
+            resume_score=resume_score,
         )
-        return redirect("/interview")
+
+        if resume_score >= 50:
+            resume_status = "Selected"
+        else:
+            resume_status = "Rejected"
+
+        resume_feedback["status"] = resume_status
+        session["resume_feedback"] = resume_feedback
+        session.pop("interview_questions", None)
+        session.pop("interview_started", None)
+        return redirect("/screening")
 
     return render_template("upload.html", error=error)
+
+
+@app.route("/screening")
+def screening():
+    if not _is_authenticated():
+        return redirect("/login")
+    if session.get("resume_score") is None or not session.get("resume_feedback"):
+        return redirect("/upload")
+
+    resume_score = float(session.get("resume_score", 0))
+    resume_feedback = session.get("resume_feedback", {})
+    shortlisted = resume_feedback["status"] == "Selected"
+
+    return render_template(
+        "screening.html",
+        resume_score=resume_score,
+        resume_feedback=resume_feedback,
+        shortlisted=shortlisted,
+    )
+
+
+@app.route("/interview_rules")
+def interview_rules():
+    if not _is_authenticated():
+        return redirect("/login")
+    if session.get("resume_score") is None or not session.get("resume_feedback"):
+        return redirect("/upload")
+    if session.get("resume_feedback", {}).get("status") != "Selected":
+        return redirect("/screening")
+    if session.get("interview_completed"):
+        return redirect("/completed")
+    return render_template("rules.html")
 
 
 @app.route("/interview", methods=["GET"])
@@ -337,6 +709,8 @@ def interview():
         return redirect("/login")
     if session.get("interview_completed"):
         return redirect("/completed")
+    if session.get("resume_feedback", {}).get("status") != "Selected":
+        return redirect("/screening")
 
     questions = session.get("interview_questions")
     if not questions:
@@ -360,6 +734,8 @@ def start_interview():
         return redirect("/login")
     if session.get("interview_completed"):
         return redirect("/completed")
+    if session.get("resume_feedback", {}).get("status") != "Selected":
+        return redirect("/screening")
     session["interview_started"] = True
     return {"status": "ok"}
 
@@ -379,6 +755,8 @@ def evaluate():
         return redirect("/login")
     if session.get("interview_completed"):
         return redirect("/completed")
+    if session.get("resume_feedback", {}).get("status") != "Selected":
+        return redirect("/screening")
 
     questions = session.get("interview_questions", [])
     resume_text = session.get("resume_text", "")
@@ -394,6 +772,23 @@ def evaluate():
 
     final_score = (resume_score + interview_score) / 2
     decision = "Selected" if final_score >= 70 else "Rejected"
+    candidate_answers = [
+        {
+            "question": questions[idx],
+            "answer": answer_map.get(f"answer_{idx}", "").strip(),
+        }
+        for idx in range(len(questions))
+    ]
+    candidate_assessment = generate_candidate_assessment(
+        resume_text=resume_text,
+        job_description=JOB_DESCRIPTION,
+        resume_score=resume_score,
+        interview_questions=questions,
+        candidate_answers=candidate_answers,
+        interview_score=interview_score,
+        final_score=final_score,
+        final_decision=decision,
+    )
     session["interview_completed"] = True
     session["interview_started"] = False
 
@@ -405,6 +800,8 @@ def evaluate():
             final_score=round(final_score, 2),
             decision=decision,
             feedback=feedback,
+            resume_feedback=session.get("resume_feedback"),
+            candidate_assessment=candidate_assessment,
         )
     )
     return response
