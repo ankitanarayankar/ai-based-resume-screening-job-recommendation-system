@@ -1,3 +1,9 @@
-flask
+Flask
+gunicorn
 openai
 PyPDF2
+sentence-transformers
+torch
+transformers
+numpy
+scikit-learn
